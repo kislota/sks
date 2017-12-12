@@ -1,8 +1,8 @@
 <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
     <header class="demo-drawer-header">
-<!--        <img src="/template/images/user<?php echo $user['id'];?>.jpg" class="demo-avatar">-->
+<!--        <img src="/template/images/user<?php echo $user['id_user'];?>.jpg" class="demo-avatar">-->
         <div class="demo-avatar-dropdown">
-            <span>Добро пожаловать! <?php echo $user['first_name'];?></span>
+            <span>Добро пожаловать! <?php echo $user['firstname'];?></span>
             <div class="mdl-layout-spacer"></div>
             <button id="accbtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
                 <i class="material-icons" role="presentation">arrow_drop_down</i>
@@ -10,8 +10,8 @@
             </button>
             <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
                 <li class="mdl-menu__item">Заказать запчасть</li>
-                <a class="mdl-navigation__link" href="/user/<?php echo $user['id'];?>"><li class="mdl-menu__item">Редактировать профиль</li></a>
-                <a class="mdl-navigation__link" href="/kassa/user/<?php echo $user['id'];?>"><li class="mdl-menu__item">Баланс 0</li></a>
+                <a class="mdl-navigation__link" href="/user/<?php echo $user['id_user'];?>"><li class="mdl-menu__item">Редактировать профиль</li></a>
+                <a class="mdl-navigation__link" href="/kassa/user/<?php echo $user['id_user'];?>"><li class="mdl-menu__item">Баланс 0</li></a>
                 <a class="mdl-navigation__link" href="/user/logout"><li class="mdl-menu__item">Выход</li></a>
                 <!--<li class="mdl-menu__item"><i class="material-icons">add</i>Add another account...</li>-->
             </ul>

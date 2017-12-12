@@ -2,7 +2,8 @@
     <div class="mdl-layout__header-row">
         <span class="mdl-layout-title"></span>
         <div class="mdl-layout-spacer">
-            <?php self::header_menu_top(); ?>
+            <?php include ROOT . '/views/' . $this->top_menu . '/menu_top.php'; ?>
+            <?php //$this->header_menu_top() ?>
         </div>
         <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
             <label class="mdl-button mdl-js-button mdl-button--icon" for="search">

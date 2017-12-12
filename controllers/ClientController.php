@@ -3,13 +3,12 @@
 class ClientController extends Controller {
 
     public $header = 'Клиенты';
+    public $top_menu = 'client';
 
-    public function header_menu_top() {
-        $header_menu = ROOT . '/views/client/menu_top.php';
-        echo file_get_contents($header_menu);
-        return true;
-    }
-
+    /**
+     * Список клиентов
+     * @param int $page <p>Текущаяя страница</p>
+     */
     public function actionIndex($page = 1) {
         //Проверяем права пользователя
         $user = User::getUserCheckAccess();
@@ -35,6 +34,21 @@ class ClientController extends Controller {
 
     public function actionDel() {
         
+    }
+
+    /**
+     * Поиск клиентов AJAX
+     */
+    public function actionSearch() {
+        // Проверка доступа
+        $user = User::getUserCheckAccess();
+
+//------------------------------------------------------------------------------
+        $search = $_REQUEST['client'];
+        $clientList = Client::getClientSearch($search);
+
+//-----------------------------Конец--------------------------------------------
+        die();
     }
 
 }

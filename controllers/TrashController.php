@@ -1,27 +1,23 @@
 <?php
 
-class TrashController extends Controller{
+class TrashController extends Controller {
 
     public $header = 'Корзина';
-
-    public function header_menu_top() {
-        $header_menu = ROOT . '/views/trash/menu_top.php';
-        echo file_get_contents($header_menu);
-        return true;
-    }
+    public $top_menu = 'trash';
 
     public function actionIndex($page = 1) {
+        //Проверяем права пользователя
         $user = User::getUserCheckAccess();
+        //Заявка удалена
         $trash = 1;
+        //Получаем номер страницы
         $page = $this->getPage($page);
-        $orderList = array();
-        $orderList = Order::getOrderList($page, $trash);
-
-        // Общее количетсво товаров (необходимо для постраничной навигации)
-        $total = Order::getOrderPaginationCount('', $trash);
-        $count = count($total);
-        $pagination = new Pagination($count, $page, $this->count, 'page-');
-
+        //Выбираем нужные записи из таблицы
+        $orderList = $this->getOrderForeach(Order::getOrderList($page, $trash));
+        // Общее количетсво заявок (необходимо для постраничной навигации)
+        $count = count(Db::getSelect('orders', 'trash = 0'));
+        //Постраничная навигация
+        $pagination = new Pagination($count, $page, $this->show_def, 'page-');
 //-----------------------------Вывод шаблона------------------------------------
         require_once(ROOT . '/views/trash/index.php');
         return true;
@@ -33,11 +29,9 @@ class TrashController extends Controller{
     public function actionUndel($id) {
         // Проверка доступа
         $user = User::getUserCheckAccess();
-        $trash = 0;
-
 //------------------------------------------------------------------------------
         if ($id) {
-            $OrderDel = Trash::getTrash($id, $trash);
+            $OrderDel = Trash::getTrash($id, '0');
             // Возвращаем пользователя на страницу с которой он пришел
 
             $referrer = $_SERVER['HTTP_REFERER'];

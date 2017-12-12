@@ -1,8 +1,6 @@
 <?php include ROOT . '/views/layouts/header.php'; ?>
 <?php include ROOT . '/views/layouts/header_menu.php'; ?>
 <?php include ROOT . '/views/layouts/menu.php'; ?>
-
-
 <main class="mdl-layout__content mdl-color--grey-100">
     <div class="mdl-grid demo-content">
         <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
@@ -27,7 +25,7 @@
                     </thead>
                     <tbody>
                         <?php foreach ($orderList as $orderItem): ?>
-                            <tr role="row" class="drag <?=$this->getStatusClassTable($orderItem[0]['id_status'])?>">
+                            <tr role="row" class="drag <?=$this->getStatusClassTable($orderItem['id_status'])?>">
                                 <td style="text-align: center; min-width: 33px;">
                                     <?php echo $orderItem['id_orders'] ?>
                                 </td>
@@ -37,7 +35,7 @@
                                     <?php echo $orderItem['data'] ?>
                                 </td>
                                 <td style="text-align: center; min-width: 120px;">
-                                    <?php echo $orderItem['firstname'] . " " . $orderItem['lastname'] ?>
+                                    <?php echo $orderItem['clientfname'] . " " . $orderItem['clientlname'] ?>
                                     <br>
                                     <span style='opacity: .7;'>
                                         <?php echo $orderItem['phone'] ?>

@@ -9,11 +9,10 @@ class Trash {
         // Соединение с БД
         $db = Db::getConnection();
         //Выбираем заявку которую надо удалить
-        $result = $db->query('UPDATE orders SET trash = ' . $trash . ' WHERE id=' . $id);
+        $result = $db->query('UPDATE orders SET trash = ' . $trash . ' WHERE id_orders = ' . $id);
         // Выполнение коменды
         $result->execute();
 
         return true;
     }
-
 }

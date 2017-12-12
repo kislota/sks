@@ -17,7 +17,7 @@
                 </thead>
                     <?php foreach ($clientList as $clientItem): ?>
                 <tr role="row" class="drag <?php echo Settings::getStatusClassTable($clientItem['problem']) ?>">
-                            <td><?php echo $clientItem['id_clients'] ?></td>
+                            <td><?php echo $clientItem['id_client'] ?></td>
                             <td><?php echo $clientItem['firstname'] . $clientItem['lastname'] ?></td>
                             <td><?php echo $clientItem['phone'] ?></td>
                             <td><?php echo $clientItem['address'] ?></td>

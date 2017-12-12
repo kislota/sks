@@ -8,13 +8,19 @@ class Brand {
      * @return array $result <p>Данные о бренде</p>
      */
     public static function getBrandById($id) {
-        $table = 'brand';
-        $where = 'id_brand = ' . $id;
-
-        $result = Db::getSelect($table, $where);
-        return $result;
+            $db = Db::getConnection();
+            // Текст запроса к БД
+            $sql = 'SELECT * FROM brand '
+                    . 'WHERE id_brand = :id';
+            // Используется подготовленный запрос
+            $result = $db->prepare($sql);
+            $result->bindParam(':id', $id, PDO::PARAM_INT);
+            // Выполнение коменды
+            $result->execute();
+            $result->setFetchMode(PDO::FETCH_ASSOC);
+            return $result->fetch();
     }
-    
+
     /**
      * Все бренды для выбора нужного
      * @param int $active <p>Активен или нет бренд. Активен = 1, Отключен = 0</p>
@@ -27,7 +33,7 @@ class Brand {
         //Возвращаем массив с данными
         return $result;
     }
-    
+
     /**
      * Добавление бренда
      * @param string $brand_name <p>Назание бренда</p>
@@ -52,7 +58,7 @@ class Brand {
         $insertId = $db->lastInsertId();
         return $insertId;
     }
-    
+
     /**
      * Редактирование бренда
      * @param int $id <p>Идентификатор бренда</p>
@@ -62,7 +68,7 @@ class Brand {
     public static function getBrandEdit($id, $param) {
         return true;
     }
-    
+
     /**
      * Удаление бренда
      * @param string $id <p>Идентификатор бренда</p>

@@ -34,7 +34,7 @@
                     <input type="text" required name="lastname" id="lastname" autocomplete="off" class="form-control" placeholder="Фамилия" value="<?php if ($clientItem !== Array()) { echo $clientItem['lastname'];} ?>">
                 </div>
                 <div class="col-sm-4">
-                    <input type="text" id="phone" name="phone" required autocomplete="off" class="form-control" placeholder="Телефон" value="<?php if ($clientItem !== Array()) {echo $clientItem['phone'];}  ?>">
+                    <input type="text" id="phone" name="phone" required autocomplete="off" class="form-control" placeholder="Телефон" value="<?php if ($clientItem !== Array()) {echo $clientItem['phone'];} ?>">
                 </div>
             </div>
             </br>
@@ -116,7 +116,6 @@
                 </div>
             </div>
             </br>
-            <input type="hidden" name="id_help" value="0">
         </form>
     </div>
 </main>

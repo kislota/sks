@@ -22,9 +22,9 @@
                             <td><?php echo $partItem['price'] ?></td>
                             <td><?php echo $partItem['count'] ?></td>
                             <td><?php echo $partItem['id_category'] ?></td>
-                            <td><a href='/part/edit/<?php echo $partItem['id'] ?>' class='btn btn-default btn-smile'><i class="material-icons">edit</i></a>
-                                <a href='/part/del/<?php echo $partItem['id'] ?>'  onClick='return window.confirm(\"Удалить ремонт?\")' class='btn btn-default btn-smile'><i class="material-icons">delete_forever</i></a>
-                                <a href='/part/pay/<?php echo $partItem['id'] ?>'  onClick='return window.confirm(\"Оплатить мастеру?\")' class='btn btn-default btn-smile'><i class="material-icons">shopping_cart</i></a></td>
+                            <td><a href='/part/edit/<?php echo $partItem['id_parts'] ?>' class='btn btn-default btn-smile'><i class="material-icons">edit</i></a>
+                                <a href='/part/del/<?php echo $partItem['id_parts'] ?>'  onClick='return window.confirm(\"Удалить ремонт?\")' class='btn btn-default btn-smile'><i class="material-icons">delete_forever</i></a>
+                                <a href='/part/pay/<?php echo $partItem['id_parts'] ?>'  onClick='return window.confirm(\"Оплатить мастеру?\")' class='btn btn-default btn-smile'><i class="material-icons">shopping_cart</i></a></td>
                         </tr>
                     <?php endforeach; ?>
                 

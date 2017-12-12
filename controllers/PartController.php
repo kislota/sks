@@ -3,12 +3,7 @@
 class PartController extends Controller{
 
     public $header = 'Склад';
-
-    public function header_menu_top() {
-        $header_menu = ROOT . '/views/part/menu_top.php';
-        echo file_get_contents($header_menu);
-        return true;
-    }
+    public $top_menu = 'part';
 
 //------------------------------------------------------------------------------
 //-----------------------------Вывести то что есть на складе--------------------

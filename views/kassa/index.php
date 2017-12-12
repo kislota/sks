@@ -5,6 +5,11 @@
     <div class="mdl-grid demo-content">
         <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
             <div class="table-responsive">
+                <!-- Постраничная навигация -->
+                <?php
+                if ($count > 4): echo $pagination->get();
+                endif;
+                ?>
                 <table class="table table-bordered table-hover" style="text-align: center; margin-bottom: 0px;">
                     <thead>
                         <tr>
@@ -20,7 +25,7 @@
                     </thead>
                     <?php if (isset($kassaList) && is_array($kassaList)): ?>
                         <?php foreach ($kassaList as $kassaItem): ?>
-                    <tr role="row" class="drag <?=Kassa::getKassaPayStyle($kassaItem['coming'], $kassaItem['cost'])?>">
+                            <tr role="row" class="drag <?= Kassa::getKassaPayStyle($kassaItem['coming'], $kassaItem['cost']) ?>">
                                 <td><?php echo $kassaItem['id'] ?></td>
                                 <?php if ($kassaItem['coming'] >= 0): ?>
                                     <td><?php echo $kassaItem['coming'] ?></td>
@@ -39,6 +44,11 @@
                     <?php endif; ?>
 
                 </table>
+                <!-- Постраничная навигация -->
+                <?php
+                if ($count > 4): echo $pagination->get();
+                endif;
+                ?>
             </div>
         </div>
     </div>

@@ -5,6 +5,8 @@
  */
 class User {
 
+    public $hesh = 'kompservis';
+
     /**
      * Регистрация пользователя 
      * @param string $user_name <p>Login</p>
@@ -13,20 +15,24 @@ class User {
      * @param string $last_name <p>Фамилия</p>
      * @return boolean <p>Результат выполнения метода</p>
      */
-    public static function getUserRegister($user_name, $password, $first_name = '', $last_name = '') {
+    public static function getUserRegister($param) {
+        $paramUser = json_decode($param);
+        $firstname = '';
+        $lastname = '';
         // Соединение с БД
         $db = Db::getConnection();
 
+//        $password = md5($password);
         // Текст запроса к БД
-        $sql = 'INSERT INTO users (user_name, password, first_name, last_name) '
-                . 'VALUES (:user_name, :password, :first_name, :last_name)';
+        $sql = 'INSERT INTO users (username, password, firstname, lastname) '
+                . 'VALUES (:username, :password, :firstname, :lastname)';
 
         // Получение и возврат результатов. Используется подготовленный запрос
         $result = $db->prepare($sql);
-        $result->bindParam(':user_name', $user_name, PDO::PARAM_STR);
-        $result->bindParam(':password', $password, PDO::PARAM_STR);
-        $result->bindParam(':first_name', $first_name, PDO::PARAM_STR);
-        $result->bindParam(':last_name', $last_name, PDO::PARAM_STR);
+        $result->bindParam(':username', $paramUser->username, PDO::PARAM_STR);
+        $result->bindParam(':password', md5($paramUser->password), PDO::PARAM_STR);
+        $result->bindParam(':firstname', $firstname, PDO::PARAM_STR);
+        $result->bindParam(':lastname', $lastname, PDO::PARAM_STR);
         $result->execute();
         //id последней добавленной записи
         $insertRegId = $db->lastInsertId();
@@ -41,20 +47,23 @@ class User {
      * @param string $password <p>Пароль</p>
      * @return boolean <p>Результат выполнения метода</p>
      */
-    public static function getUserEdit($id, $user_name, $password) {
+    public static function getUserEdit($param) {
+        $paramUser = json_decode($param);
         // Соединение с БД
         $db = Db::getConnection();
 
         // Текст запроса к БД
         $sql = "UPDATE users 
-            SET user_name = :user_name, password = :password 
-            WHERE id = :id";
+            SET username = :username, password = :password, firstname = :firstname, lastname = :lastname 
+            WHERE id_user = :id";
 
         // Получение и возврат результатов. Используется подготовленный запрос
         $result = $db->prepare($sql);
-        $result->bindParam(':id', $id, PDO::PARAM_INT);
-        $result->bindParam(':user_name', $user_name, PDO::PARAM_STR);
-        $result->bindParam(':password', $password, PDO::PARAM_STR);
+        $result->bindParam(':id', $paramUser->id, PDO::PARAM_INT);
+        $result->bindParam(':username', $paramUser->username, PDO::PARAM_STR);
+        $result->bindParam(':password', md5($paramUser->password), PDO::PARAM_STR);
+        $result->bindParam(':firstname', $paramUser->firstname, PDO::PARAM_STR);
+        $result->bindParam(':lastname', $paramUser->lastname, PDO::PARAM_STR);
         return $result->execute();
     }
 
@@ -64,17 +73,17 @@ class User {
      * @param string $password <p>Пароль</p>
      * @return mixed : integer user id or false
      */
-    public static function getUserCheckData($user_name, $password) {
+    public static function getUserCheckData($param) {
         // Соединение с БД
         $db = Db::getConnection();
-
+        $paramUser = json_decode($param);
         // Текст запроса к БД
-        $sql = 'SELECT * FROM users WHERE user_name = :user_name AND password = :password';
+        $sql = 'SELECT * FROM users WHERE username = :username AND password = :password';
 
         // Получение результатов. Используется подготовленный запрос
         $result = $db->prepare($sql);
-        $result->bindParam(':user_name', $user_name, PDO::PARAM_INT);
-        $result->bindParam(':password', $password, PDO::PARAM_INT);
+        $result->bindParam(':username', $paramUser->username, PDO::PARAM_INT);
+        $result->bindParam(':password', md5($paramUser->password), PDO::PARAM_INT);
         $result->execute();
 
         // Обращаемся к записи
@@ -82,7 +91,7 @@ class User {
 
         if ($user) {
             // Если запись существует, возвращаем id пользователя
-            return $user['id'];
+            return $user['id_user'];
         }
         return false;
     }
@@ -101,16 +110,16 @@ class User {
      * @param string $user_name <p>Login</p>
      * @return boolean <p>Результат выполнения метода</p>
      */
-    public static function getUserCheckName($user_name) {
+    public static function getUserCheckName($username) {
 
         // Соединение с БД
         $db = Db::getConnection();
         // Текст запроса к БД
-        $sql = 'SELECT * FROM users WHERE user_name = :user_name;';
+        $sql = 'SELECT * FROM users WHERE username = :username;';
 
         // Получение результатов. Используется подготовленный запрос
         $result = $db->prepare($sql);
-        $result->bindParam(':user_name', $user_name, PDO::PARAM_INT);
+        $result->bindParam(':username', $username, PDO::PARAM_INT);
         $result->execute();
 
         // Обращаемся к записи
@@ -191,7 +200,7 @@ class User {
         $db = Db::getConnection();
 
         // Текст запроса к БД
-        $sql = 'SELECT * FROM users WHERE id_users = :id';
+        $sql = 'SELECT * FROM users WHERE id_user = :id';
 
         // Получение и возврат результатов. Используется подготовленный запрос
         $result = $db->prepare($sql);

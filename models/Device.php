@@ -8,12 +8,17 @@ class Device {
      * @return array $result <p>Данные о устройстве</p>
      */
     public static function getDeviceById($id) {
-        $table = 'device';
-        $where = 'id_device = ' . $id;
-
-        $result = Db::getSelect($table, $where);
-        //Возвращаем массив с данными для вывода заявки
-        return $result;
+            $db = Db::getConnection();
+            // Текст запроса к БД
+            $sql = 'SELECT * FROM device '
+                    . 'WHERE id_device = :id';
+            // Используется подготовленный запрос
+            $result = $db->prepare($sql);
+            $result->bindParam(':id', $id, PDO::PARAM_INT);
+            // Выполнение коменды
+            $result->execute();
+            $result->setFetchMode(PDO::FETCH_ASSOC);
+            return $result->fetch();
     }
 
     /**

@@ -8,108 +8,23 @@ class Order {
     const SHOW_BY_DEFAULT = 5;
 
     /**
-     * Подготовка к выводу в шаблон и добавление всего в асоциативный массив
-     * @param array() $result <p>Результат выборки из базы по запросам</p>
-     * @return array() $orderList <p>Асоциативный массив заявок</p>
-     */
-    public static function getOrderForeach($result) {
-        $i = 0;
-        $orderList = array();
-        foreach ($result as $key) {
-            $orderList[$i] = $key;
-            $clientId = Client::getClientById($orderList[$i]['id_client']);
-            if ($clientId) {
-                $orderList[$i]['firstname'] = $clientId[0]['firstname'];
-                $orderList[$i]['lastname'] = $clientId[0]['lastname'];
-                $orderList[$i]['phone'] = $clientId[0]['phone'];
-                if ($clientId[0]['id_address'] != 0) {
-                    $orderList[$i]['address'] = $clientId[0]['address'];
-                } else {
-                    $orderList[$i]['address'] = '';
-                }
-            } else {
-                $orderList[$i]['firstname'] = '';
-                $orderList[$i]['lastname'] = '';
-                $orderList[$i]['phone'] = '';
-            }
-            $managerId = User::getUserById($orderList[$i]['id_manager']);
-            if ($managerId) {
-                $orderList[$i]['manager_firstname'] = $managerId['first_name'];
-                $orderList[$i]['manager_lastname'] = $managerId['last_name'];
-            } else {
-                $orderList[$i]['manager_firstname'] = '';
-                $orderList[$i]['manager_lastname'] = '';
-            }
-            $masterId = User::getUserById($orderList[$i]['id_master']);
-            if ($masterId) {
-                $orderList[$i]['master_firstname'] = $masterId['first_name'];
-                $orderList[$i]['master_lastname'] = $masterId['last_name'];
-            } else {
-                $orderList[$i]['master_firstname'] = '';
-                $orderList[$i]['master_lastname'] = '';
-            }
-            $deviceId = Device::getDeviceById($orderList[$i]['id_device']);
-            if ($deviceId) {
-                $orderList[$i]['device_name'] = $deviceId[0]['device_name'];
-            } else {
-                $orderList[$i]['device_name'] = '';
-            }
-            $brandId = Brand::getBrandById($orderList[$i]['id_brand']);
-            if ($brandId) {
-                $orderList[$i]['brand_name'] = $brandId[0]['brand_name'];
-            } else {
-                $orderList[$i]['brand_name'] = '';
-            }
-            $i++;
-        }
-
-        return $orderList;
-    }
-
-    /**
      * Вывод отдельной записи
      * @param int $id <p>Идентификатор записи</p>
      * @return array() $orderList <p>Возвращаем массив с данными для вывода заявки</p>
      */
     public static function getOrderById($id) {
-        $table = 'orders';
-        $where = 'id_orders = ' . $id;
-
-        $result = Db::getSelect($table, $where);
-        $orderList = array();
-        foreach ($result as $key) {
-            $orderList = $key;
-
-            $clientId = Client::getClientById($orderList['id_client']);
-            if ($clientId) {
-                $orderList['firstname'] = $clientId[0]['firstname'];
-                $orderList['lastname'] = $clientId[0]['lastname'];
-                $orderList['phone'] = $clientId[0]['phone'];
-                if ($clientId[0]['id_address'] != 0) {
-                    $orderList['address'] = $clientId[0]['address'];
-                } else {
-                    $orderList['address'] = '';
-                }
-            } else {
-                $orderList['firstname'] = '';
-                $orderList['lastname'] = '';
-                $orderList['phone'] = '';
-            }
-            $deviceId = Device::getDeviceById($orderList['id_device']);
-            if ($deviceId) {
-                $orderList['device_name'] = $deviceId[0]['device_name'];
-            } else {
-                $orderList['device_name'] = '';
-            }
-            $brandId = Brand::getBrandById($orderList['id_brand']);
-            if ($brandId) {
-                $orderList['brand_name'] = $brandId[0]['brand_name'];
-            } else {
-                $orderList['brand_name'] = '';
-            }
-        }
+        $db = Db::getConnection();
+        // Текст запроса к БД
+        $sql = 'SELECT * FROM orders '
+                . 'WHERE id_orders = :id';
+        // Используется подготовленный запрос
+        $result = $db->prepare($sql);
+        $result->bindParam(':id', $id, PDO::PARAM_INT);
+        // Выполнение коменды
+        $result->execute();
+        $result->setFetchMode(PDO::FETCH_ASSOC);
         //Возвращаем массив с данными для вывода заявки
-        return $orderList;
+        return $result->fetch();
     }
 
     /**
@@ -124,11 +39,8 @@ class Order {
         $offset = ($page - 1) * self::SHOW_BY_DEFAULT;
         $table = 'orders';
         $where = 'trash = ' . $trash . ' ORDER BY data DESC LIMIT ' . $count . ' OFFSET ' . $offset;
-        $result = Db::getSelect($table, $where);
-        $orderList = self::getOrderForeach($result);
-
         //Возвращаем массив с данными для вывода заявки
-        return $orderList;
+        return Db::getSelect($table, $where);
     }
 
     /**
@@ -143,12 +55,8 @@ class Order {
         $offset = ($page - 1) * self::SHOW_BY_DEFAULT;
         $table = 'orders';
         $where = $where . ' ORDER BY data DESC LIMIT ' . $count . ' OFFSET ' . $offset;
-
-        $result = Db::getSelect($table, $where);
-        $orderList = self::getOrderForeach($result);
-
         //Возвращаем массив с данными для вывода заявки
-        return $orderList;
+        return Db::getSelect($table, $where);
     }
 
     /**
@@ -160,8 +68,9 @@ class Order {
         $param = json_decode($param);
         $ticket = time();
         $user = User::getUserCheckAccess();
-        $id_manager = $user['id'];
+        $id_manager = $user['id_user'];
         $id_status = 1;
+        $id_help = 0;
         $table = 'orders';
         $colums = "id_client, id_device, id_brand, "
                 . "defect, complit, id_status, id_manager, id_master, model, sn, "
@@ -169,7 +78,7 @@ class Order {
         $value = "'" . $param->id_client . "', '" . $param->id_device . "', '" . $param->id_brand . "', '"
                 . $param->defect . "', '" . $param->complit . "', '" . $id_status . "', '" . $id_manager . "', '" . $param->id_master . "', '"
                 . $param->model . "', '" . $param->sn . "', '"
-                . $param->id_media . "', '" . $param->id_help . "', '" . $ticket . "'";
+                . $param->id_media . "', '" . $id_help . "', '" . $ticket . "'";
 
         $insertId = Db::getInsert($table, $colums, $value);
         return $insertId;
@@ -180,6 +89,7 @@ class Order {
 //------------------------------------------------------------------------------
     public static function getOrderEditId($param) {
         $param = json_decode($param);
+        $id_help = 0;
         $table = 'orders';
         $colums = "id_client, id_device, id_brand, "
                 . "defect, complit, id_status, id_master, model, sn, "
@@ -189,65 +99,34 @@ class Order {
                 . "complit = '$param->complit', id_status = '$param->id_status', "
                 . "id_master = '$param->id_master', "
                 . "model = '$param->model', sn = '$param->sn', id_media = '$param->id_media', "
-                . "id_help = '$param->id_help' WHERE id = '$param->id'";
+                . "id_help = '$id_help' WHERE id_orders = '$param->id_orders'";
 
         $updateOrder = Db::getUpdate($table, $value);
 
-        return $param->id;
-    }
-
-//------------------------------------------------------------------------------
-//-----------------------------Поиск по клиенту---------------------------------
-//------------------------------------------------------------------------------
-    public static function getOrderSearch($search) {
-        // Соединение с БД
-        $db = Db::getConnection();
-        // Текст запроса к БД
-        $sql = 'SELECT * FROM clients '
-                . 'WHERE firstname LIKE ? '
-                . 'ORDER BY id DESC';
-        // Используется подготовленный запрос
-        $result = $db->prepare($sql);
-        //Выполняем запрос
-        $result->execute(array("%$search%"));
-        // Указываем, что хотим получить данные в виде массива
-        $result->setFetchMode(PDO::FETCH_ASSOC);
-        // Массив для клиентов
-        $clientList = array();
-        $i = 0;
-        while ($row = $result->fetch()) {
-            $clientList[$i]['id'] = $row['id'];
-            $clientList[$i]['firstname'] = $row['firstname'];
-            $clientList[$i]['lastname'] = $row['lastname'];
-            $clientList[$i]['phone'] = $row['phone'];
-            echo "<li>" . $clientList[$i]['firstname'] . " " . $clientList[$i]['lastname'] . " " . $clientList[$i]['phone'] . "</li>";
-            $i++;
-        }
-        //Возврящаем массив с клиентами
-        return $clientList;
+        return $param->id_orders;
     }
 
 //------------------------------------------------------------------------------
 //-----------------------------Оплатить заявку----------------------------------
 //------------------------------------------------------------------------------
     public static function getOrderPayID($id) {
-        // Соединение с БД
+// Соединение с БД
         $db = Db::getConnection();
-        //Проверяем пришло ли ID и содержит ли оно цифры
+//Проверяем пришло ли ID и содержит ли оно цифры
         $id = intval($id);
-        //Меняем NULL на 1 что бы дать знать что оплатили, но надо будет потом 
-        //записывать ID значения в кассе при оплате что бы подтягивалось всё
+//Меняем NULL на 1 что бы дать знать что оплатили, но надо будет потом 
+//записывать ID значения в кассе при оплате что бы подтягивалось всё
 
         if ($id) {
-            //id записи в кассе
+//id записи в кассе
             $insertPay = Kassa::getPayAdd($id, 'orders');
-            //Запрос в БД
-            $sql = "UPDATE orders SET id_pay = ? WHERE id = " . $insertPay;
-            //Подготовленный запрос
+//Запрос в БД
+            $sql = "UPDATE orders SET id_pay = ? WHERE id_orders = " . $id;
+//Подготовленный запрос
             $orderPay = $db->prepare($sql);
-            //Задаём значение псевдопеременной
+//Задаём значение псевдопеременной
             $orderPay->bindParam(1, $insertPay);
-            //Выполняем запрос
+//Выполняем запрос
             $orderPay->execute();
             return true;
         }

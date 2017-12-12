@@ -21,7 +21,7 @@ class Client {
         $sql = 'SELECT clients.*, clients_address.* FROM clients LEFT '
                 . 'JOIN clients_address ON clients.id_address = '
                 . 'clients_address.id_address '
-                . 'ORDER BY clients.id_clients DESC LIMIT :count OFFSET :offset';
+                . 'ORDER BY clients.id_client DESC LIMIT :count OFFSET :offset';
 
         // Используется подготовленный запрос
         $result = $db->prepare($sql);
@@ -60,7 +60,7 @@ class Client {
 
         if ($client) {
             // Если запись существует, возвращаем id пользователя
-            $clientId = $client['id'];
+            $clientId = $client['id_client'];
             return $clientId;
         }
 
@@ -133,22 +133,20 @@ class Client {
      * @return array $clientId <p>Массив с клентам</p>
      */
     public static function getClientById($id) {
+
         $db = Db::getConnection();
         // Текст запроса к БД
         $sql = 'SELECT clients.*, clients_address.* FROM clients LEFT '
                 . 'JOIN clients_address ON clients.id_address = '
                 . 'clients_address.id_address '
-                . 'WHERE clients.id_clients = :id';
+                . 'WHERE clients.id_client = :id';
         // Используется подготовленный запрос
         $result = $db->prepare($sql);
         $result->bindParam(':id', $id, PDO::PARAM_INT);
         // Выполнение коменды
-        $result->setFetchMode(PDO::FETCH_ASSOC);        
         $result->execute();
-               foreach ($result as $key => $value) {
-            $clientList[$key] = $value;
-        }
-        return $clientList;
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+        return $result->fetch();
     }
 
     /**
@@ -157,16 +155,47 @@ class Client {
      * @return array $addressId <p>Массив с адресом клента</p>
      */
     public static function getClientAddressById($id_address) {
-        $table = 'clients_address';
-        $where = 'id_clients = ' . $id_address;
+        /*        $table = 'clients_address';
+          $where = 'id_client = ' . $id_address;
 
-        $result = Db::getSelect($table, $where);
-        $addressId = [];
-        foreach ($result as $key) {
-            $addressId = $key;
+          $result = Db::getSelect($table, $where);
+          debug($result);
+          die;
+          $addressId = [];
+          foreach ($result as $key) {
+          $addressId = $key;
+          }
+          //Возвращаем массив с данными для вывода заявки
+          return $addressId;
+         */
+        return true;
+    }
+
+    /**
+     * Поиск по клиенту AJAX
+     * @param int $search <p>строка поиска</p>
+     * @return array $clientList <p>Массив с клентам</p>
+     */
+    public static function getClientSearch($search) {
+        // Соединение с БД
+        $db = Db::getConnection();
+        // Текст запроса к БД
+        $sql = 'SELECT * FROM clients '
+                . 'WHERE firstname LIKE ? '
+                . 'ORDER BY id_client DESC';
+        // Используется подготовленный запрос
+        $result = $db->prepare($sql);
+        //Выполняем запрос
+        $result->execute(array("%$search%"));
+        // Указываем, что хотим получить данные в виде массива
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+        // Массив для клиентов
+        foreach ($result as $key => $value) {
+            $clientList = $value;
+            echo "<li>" . $clientList['firstname'] . " " . $clientList['lastname'] . " " . $clientList['phone'] . "</li>";
         }
-        //Возвращаем массив с данными для вывода заявки
-        return $addressId;
+        //Возврящаем массив с клиентами
+        return true;
     }
 
 }

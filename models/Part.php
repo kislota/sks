@@ -98,7 +98,7 @@ class Part {
             //id записи в кассе
             $insertPay = Kassa::getPayAdd($id, 'parts');
             //Запрос в БД
-            $sql = "UPDATE parts SET id_pay = ? WHERE id = " . $insertPay;
+            $sql = "UPDATE parts SET id_pay = ? WHERE id_prats = " . $id;
             //Подготовленный запрос
             $partPay = $db->prepare($sql);
             //Задаём значение псевдопеременной

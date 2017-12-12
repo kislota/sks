@@ -6,16 +6,16 @@
         <form method="post" action="/order/edit/<?php echo $orderItem['id_orders'] ?>">
             <div class="form-group">
                 <div class="col-sm-3">
-                    <select class="form-control" name="status">
-                        <?php foreach ($status as $statusItem): ?>
+                    <select class="form-control" name="id_status">
+                        <?php foreach ($status as $stat): ?>
                             <option 
                             <?php
-                            if ($orderItem['id_status'] == $statusItem['id']) {
+                            if ($orderItem['id_status'] == $stat['id_status']) {
                                 echo "selected='selected'";
                             }
                             ?>
-                                value="<?php echo $statusItem['id']; ?>">
-                                    <?php echo $statusItem['status_name']; ?>
+                                value="<?php echo $stat['id_status']; ?>">
+                                    <?php echo $stat['status_name']; ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -46,10 +46,10 @@
             </br>
             <div class="form-group">
                 <div class="col-sm-4">
-                    <input type="text" required name="firstname" id="firstname" autocomplete="off" class="form-control" placeholder="Имя" value="<?php echo $orderItem['firstname'] ?>">
+                    <input type="text" required name="firstname" id="firstname" autocomplete="off" class="form-control" placeholder="Имя" value="<?php echo $orderItem['clientfname'] ?>">
                 </div>
                 <div class="col-sm-4">
-                    <input type="text" required name="lastname" id="lastname" autocomplete="off" class="form-control" placeholder="Фамилия" value="<?php echo $orderItem['lastname'] ?>">
+                    <input type="text" required name="lastname" id="lastname" autocomplete="off" class="form-control" placeholder="Фамилия" value="<?php echo $orderItem['clientlname'] ?>">
                 </div>
                 <div class="col-sm-4">
                     <input type="text" id="phone" name="phone" required autocomplete="off" class="form-control" placeholder="Телефон" value="<?php echo $orderItem['phone'] ?>">
@@ -115,12 +115,12 @@
                     <select class="form-control" name="id_master">
                         <?php foreach ($users as $userItem): ?>
                             <option  <?php
-                            if ($orderItem['id_master'] == $userItem['id_users']) {
+                            if ($orderItem['id_master'] == $userItem['id_user']) {
                                 echo "selected='selected'";
                             }
                             ?>
-                                value="<?php echo $userItem['id_users']; ?>">
-                                    <?php echo $userItem['first_name'] . ' ' . $userItem['last_name']; ?>
+                                value="<?php echo $userItem['id_user']; ?>">
+                                    <?php echo $userItem['firstname'] . ' ' . $userItem['lastname']; ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -142,7 +142,7 @@
                 </div>
             </div>
             </br>
-            <input type="hidden" name="id" value="<?php echo $orderItem['id'] ?>">
+            <input type="hidden" name="id_orders" value="<?php echo $orderItem['id_orders'] ?>">
             <div class="col-xs-6">
                 <div class="input-group">
                     <div class="input-group-btn">
@@ -157,7 +157,6 @@
                 </div>
             </div>
             </br>
-            <input type="hidden" name="id_help" value="0">
             <div class="collapse" id="history" style="padding: 10px;border-radius: 5px;height: auto;border: 1px solid #ddd;margin-bottom: 20px;">
                 <h3>История заказа</h3>
             </div>

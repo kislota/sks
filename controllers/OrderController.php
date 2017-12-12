@@ -3,23 +3,19 @@
 class OrderController extends Controller {
 
     public $header = 'Заказы';
+    public $top_menu = 'order';
 
-    public function header_menu_top() {
-        $header_menu = ROOT . '/views/order/menu_top.php';
-        echo file_get_contents($header_menu);
-        return true;
-    }
-
-//------------------------------------------------------------------------------
-//-----------------------------Вывод всех заявок--------------------------------
-//------------------------------------------------------------------------------
+    /**
+     * Список заявок
+     * @param int $page <p>Текущаяя страница</p>
+     */
     public function actionIndex($page = 1) {
         //Проверяем права пользователя
         $user = User::getUserCheckAccess();
         //Получаем номер страницы
         $page = $this->getPage($page);
         //Выбираем нужные записи из таблицы
-        $orderList = Order::getOrderList($page);
+        $orderList = $this->getOrderForeach(Order::getOrderList($page));
         // Общее количетсво заявок (необходимо для постраничной навигации)
         $count = Db::getSelectCount('orders');
         //Постраничная навигация
@@ -27,12 +23,13 @@ class OrderController extends Controller {
         //-----------------------------Вывод шаблона------------------------------------
         require_once(ROOT . '/views/order/index.php');
         return true;
-
     }
 
-//------------------------------------------------------------------------------
-//-----------------------------Добавить новую заявку----------------------------
-//------------------------------------------------------------------------------
+    /**
+     * Добавление новой заявки
+     * @param int $id <p>default: id = 0</p>
+     * @todo id используеться для принятия заявки от того же клиента что был ранее
+     */
     public function actionAdd($id = 0) {
         // Проверка доступа
         $user = User::getUserCheckAccess();
@@ -69,19 +66,16 @@ class OrderController extends Controller {
         $users = User::getUserList();
         $medias = Media::getMediaList();
         $brands = Brand::getBrandList();
-
 //------------------------------------------------------------------------------
         if (isset($_POST['submit']) == "update") {
             //Данные о клиенте
             $_POST['id_client'] = Client::getClientChek($_POST['firstname'], $_POST['lastname'], $_POST['phone']);
-
             $param = json_encode($_POST);
-
             $orderEdit = Order::getOrderEditId($param);
             header("Location: /order/edit/$orderEdit");
             return true;
         }
-        $orderItem = Order::getOrderById($id);
+        $orderItem = $this->getOrderForeach(Order::getOrderById($id));
 
 //-----------------------------Вывод шаблона------------------------------------
         require_once(ROOT . '/views/order/edit.php');
@@ -97,7 +91,7 @@ class OrderController extends Controller {
 
 //------------------------------------------------------------------------------
         if ($id) {
-            $OrderDel = Trash::getTrash($id);
+            Trash::getTrash($id);
             // Возвращаем пользователя на страницу с которой он пришел
 
             $referrer = $_SERVER['HTTP_REFERER'];
@@ -112,20 +106,18 @@ class OrderController extends Controller {
 //-----------------------------Фильтр по оплатам--------------------------------
 //------------------------------------------------------------------------------
     public function actionPayment($page = 1) {
-        // Проверка доступа
+        //Проверяем права пользователя
         $user = User::getUserCheckAccess();
+        //Получаем номер страницы
         $page = $this->getPage($page);
-//------------------------------------------------------------------------------
+        //Условие оплаты
         $payment = "id_pay=0 and id_status=6";
-
-        $orderList = array();
-        $orderList = Order::getOrderListFilter($page, $payment);
-
+        //Выбираем нужные записи из таблицы
+        $orderList = $this->getOrderForeach(Order::getOrderListFilter($page, $payment));
         // Общее количетсво заявок (необходимо для постраничной навигации)
-        $total = Order::getOrderPaginationCount($payment);
-        $count = count($total);
+        $count = count(Db::getSelect('orders', $payment));
+        //Постраничная навигация
         $pagination = new Pagination($count, $page, $this->count, 'page-');
-
 //-----------------------------Вывод шаблона------------------------------------
         require_once(ROOT . '/views/order/index.php');
         return true;
@@ -135,20 +127,18 @@ class OrderController extends Controller {
 //-----------------------------Фильтр по статусу ремонта------------------------
 //------------------------------------------------------------------------------
     public function actionStatus($status, $page = 1) {
-        // Проверка доступа
+        //Проверяем права пользователя
         $user = User::getUserCheckAccess();
-
-//------------------------------------------------------------------------------
-        $status = "id_status = " . $status;
+        //Получаем номер страницы
         $page = $this->getPage($page);
-        $orderList = array();
-        $orderList = Order::getOrderListFilter($page, $status);
-
+        //Условие по статусу
+        $status = "id_status = " . $status;
+        //Выбираем нужные записи из таблицы
+        $orderList = $this->getOrderForeach(Order::getOrderListFilter($page, $status));
         // Общее количетсво заявок (необходимо для постраничной навигации)
-        $total = Order::getOrderPaginationCount($status);
-        $count = count($total);
+        $count = count(Db::getSelect('orders', $status));
+        //Постраничная навигация
         $pagination = new Pagination($count, $page, $this->count, 'page-');
-
 //-----------------------------Вывод шаблона------------------------------------
         require_once(ROOT . '/views/order/index.php');
         return true;
@@ -158,20 +148,18 @@ class OrderController extends Controller {
 //-----------------------------Фильтр по мастеру--------------------------------
 //------------------------------------------------------------------------------
     public function actionMaster($master, $page = 1) {
-        // Проверка доступа
+        //Проверяем права пользователя
         $user = User::getUserCheckAccess();
-
-//------------------------------------------------------------------------------
-        $master = "id_master='" . $master . "'";
+        //Получаем номер страницы
         $page = $this->getPage($page);
-        $orderList = array();
-        $orderList = Order::getOrderListFilter($page, $master);
-
+        //Условие по статусу
+        $master = "id_master='" . $master . "'";
+        //Выбираем нужные записи из таблицы
+        $orderList = $this->getOrderForeach(Order::getOrderListFilter($page, $master));
         // Общее количетсво заявок (необходимо для постраничной навигации)
-        $total = Order::getOrderPaginationCount($master);
-        $count = count($total);
+        $count = count(Db::getSelect('orders', $master));
+        //Постраничная навигация
         $pagination = new Pagination($count, $page, $this->count, 'page-');
-
 //-----------------------------Вывод шаблона------------------------------------
         require_once(ROOT . '/views/order/index.php');
         return true;
@@ -181,20 +169,18 @@ class OrderController extends Controller {
 //-----------------------------Фильтр по рекламе--------------------------------
 //------------------------------------------------------------------------------
     public function actionMedia($media, $page = 1) {
-        // Проверка доступа
+        //Проверяем права пользователя
         $user = User::getUserCheckAccess();
-
-//------------------------------------------------------------------------------
-        $media = "id_media='" . $media . "'";
+        //Получаем номер страницы
         $page = $this->getPage($page);
-        $orderList = array();
-        $orderList = Order::getOrderListFilter($page, $media);
-
+        //Условие по статусу
+        $media = "id_media='" . $media . "'";
+        //Выбираем нужные записи из таблицы
+        $orderList = $this->getOrderForeach(Order::getOrderListFilter($page, $media));
         // Общее количетсво заявок (необходимо для постраничной навигации)
-        $total = Order::getOrderPaginationCount($media);
-        $count = count($total);
+        $count = count(Db::getSelect('orders', $media));
+        //Постраничная навигация
         $pagination = new Pagination($count, $page, $this->count, 'page-');
-
 //-----------------------------Вывод шаблона------------------------------------
         require_once(ROOT . '/views/order/index.php');
         return true;
@@ -204,20 +190,18 @@ class OrderController extends Controller {
 //-----------------------------Фильтр по вызову специалиста---------------------
 //------------------------------------------------------------------------------
     public function actionHelp($page = 1) {
-        // Проверка доступа
+        //Проверяем права пользователя
         $user = User::getUserCheckAccess();
-
-//------------------------------------------------------------------------------
-        $help = "id_help=1";
+        //Получаем номер страницы
         $page = $this->getPage($page);
-        $orderList = array();
-        $orderList = Order::getOrderListFilter($page, $help);
-
+        //Условие по статусу
+        $help = "id_help=1";
+        //Выбираем нужные записи из таблицы
+        $orderList = $this->getOrderForeach(Order::getOrderListFilter($page, $help));
         // Общее количетсво заявок (необходимо для постраничной навигации)
-        $total = Order::getOrderPaginationCount($help);
-        $count = count($total);
+        $count = count(Db::getSelect('orders', $help));
+        //Постраничная навигация
         $pagination = new Pagination($count, $page, $this->count, 'page-');
-
 //-----------------------------Вывод шаблона------------------------------------
         require_once(ROOT . '/views/order/index.php');
         return true;
@@ -227,19 +211,18 @@ class OrderController extends Controller {
 //-----------------------------Фильтр по ячейкам--------------------------------
 //------------------------------------------------------------------------------
     public function actionCell($cell = "cell>0", $page = 1) {
-        // Проверка доступа
+        //Проверяем права пользователя
         $user = User::getUserCheckAccess();
-
-//------------------------------------------------------------------------------
+        //Получаем номер страницы
         $page = $this->getPage($page);
-        $orderList = array();
-        $orderList = Order::getOrderListFilter($page, $cell);
-
+        //Условие по статусу
+        $cell = "cell>0";
+        //Выбираем нужные записи из таблицы
+        $orderList = $this->getOrderForeach(Order::getOrderListFilter($page, $cell));
         // Общее количетсво заявок (необходимо для постраничной навигации)
-        $total = Order::getOrderPaginationCount($cell);
-        $count = count($total);
+        $count = count(Db::getSelect('orders', $cell));
+        //Постраничная навигация
         $pagination = new Pagination($count, $page, $this->count, 'page-');
-
 //-----------------------------Вывод шаблона------------------------------------
         require_once(ROOT . '/views/order/index.php');
         return true;
@@ -262,21 +245,6 @@ class OrderController extends Controller {
 
 //-----------------------------Конец--------------------------------------------
         return true;
-    }
-
-//------------------------------------------------------------------------------
-//-----------------------------Фильтр по статусу ремонта------------------------
-//------------------------------------------------------------------------------
-    public function actionSearch() {
-        // Проверка доступа
-        $user = User::getUserCheckAccess();
-
-//------------------------------------------------------------------------------
-        $search = $_REQUEST['client'];
-        $clientList = Order::getOrderSearch($search);
-
-//-----------------------------Конец--------------------------------------------
-        die();
     }
 
 }

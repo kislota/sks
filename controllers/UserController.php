@@ -3,12 +3,7 @@
 class UserController extends Controller{
 
     public $header = 'Пользователь';
-
-    public function header_menu_top() {
-        $header_menu = ROOT . '/views/user/menu_top.php';
-        echo file_get_contents($header_menu);
-        return true;
-    }
+    public $top_menu = 'user';
 
     public function actionIndex() {
         $user = User::getUserCheckAccess();
@@ -28,22 +23,17 @@ class UserController extends Controller{
             echo "<meta http-equiv='refresh' content='0; url= /order'>";
         } else {
             // Переменные для формы
-            $user_name = false;
+            $username = false;
             $password = false;
-
             // Обработка формы
             if (isset($_POST['login'])) {
                 // Если форма отправлена 
                 // Получаем данные из формы
-                $user_name = $_POST['username'];
-                $password = $_POST['password'];
-
+                $param = json_encode($_POST);
                 // Флаг ошибок
                 $errors = false;
-
                 // Проверяем существует ли пользователь
-                $userId = User::getUserCheckData($user_name, $password);
-
+                $userId = User::getUserCheckData($param);
                 if ($userId == false) {
                     // Если данные неправильные - показываем ошибку
                     $errors[] = 'Неправильные данные для входа на сайт';
@@ -55,7 +45,6 @@ class UserController extends Controller{
                     return true;
                 }
             }
-
             // Подключаем вид
             require_once(ROOT . '/views/user/login.php');
             return true;
@@ -68,15 +57,17 @@ class UserController extends Controller{
             echo "<meta http-equiv='refresh' content='0; url= /order'>";
         } else {
             // Переменные для формы
-            $user_name = false;
+            $username = false;
             $password = false;
             $password2 = false;
-
             // Обработка формы
             if (isset($_POST['reg'])) {
                 // Если форма отправлена 
                 // Получаем данные из формы
-                $user_name = $_POST['username'];
+                debug($_POST);
+//                die;
+                $param = json_encode($_POST);
+                $username = $_POST['username'];
                 $password = $_POST['password'];
                 $password2 = $_POST['password2'];
 
@@ -84,7 +75,7 @@ class UserController extends Controller{
                 $errors = false;
 
                 // Проверяем существует ли пользователь
-                $userId = User::getUserCheckName($user_name);
+                $userId = User::getUserCheckName($username);
 
                 if ($userId == false) {
                     // Если данные неправильные - показываем ошибку
@@ -93,7 +84,8 @@ class UserController extends Controller{
                     $errors[] = 'Пароль не совпадает';
                 } else {
                     // Если данные правильные, запоминаем пользователя (сессия)
-                    $userId = User::getUserRegister($user_name, $password);
+                    $userId = User::getUserRegister($param);
+                    User::getUserAuth($userId);
                     // Перенаправляем пользователя в закрытую часть - кабинет 
                     header("Location: /user/edit/$userId");
                     return true;

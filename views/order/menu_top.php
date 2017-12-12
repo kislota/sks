@@ -1,15 +1,14 @@
+
 <a href="/order/add" class="btn btn-success"><span class="glyphicon glyphicon-plus-sign"></span> Добавить</a>  
 <div class="btn-group">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" title="фильтр по статусу">
         <span class="glyphicon glyphicon-filter"></span>
     </button>
     <ul class="dropdown-menu" role="menu">
-        <li><a href="/order/status/1">Принята</a></li>
-        <li><a href="/order/status/2">Заказ запчасти</a></li>
-        <li><a href="/order/status/3">В работе</a></li>
-        <li><a href="/order/status/4">Выполнено</a></li>
-        <li><a href="/order/status/5">Не Выполнено</a></li>
-        <li><a href="/order/status/6">Выдано</a></li>
+        <?php $status = status(); ?>
+        <?php foreach ($status as $stat): ?>
+        <li><a href="/order/status/<?=$stat['id_status']?>"><?=$stat['status_name']?></a></li>
+        <?php endforeach;?>
     </ul>
 </div>
 <div class="btn-group">

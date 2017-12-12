@@ -5,7 +5,7 @@ $(function(){
         if(this.value.length >= 2){
             $.ajax({
                 type: 'post',
-                url: "/order/search", //Путь к обработчику
+                url: "/client/search", //Путь к обработчику
                 data: {'client':this.value},
                 response: 'text',
                 success: function(data){

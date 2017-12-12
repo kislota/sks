@@ -56,7 +56,6 @@ class Db {
         $result->setFetchMode(PDO::FETCH_ASSOC); 
         $result->execute();
         
-        $list = [];
         foreach ($result as $key => $value) {
             $list[$key] = $value;
         }
